@@ -16,7 +16,7 @@ void Controller::controllerLoop(const std::shared_ptr<Config>& config)
     m_config = config;
     pinMode(m_config->controlPin(), OUTPUT);
     digitalWrite(m_config->controlPin(), LOW);
-    
+
     while (true)
     {
         double cpuTemperature = Utility::GetCpuTemperature();
@@ -25,7 +25,7 @@ void Controller::controllerLoop(const std::shared_ptr<Config>& config)
             digitalWrite(m_config->controlPin(), HIGH);
             m_fanOn = true;
             m_turnOnTime = std::time(nullptr);
-            
+
             spdlog::info(
                 "Fan turned on: CPU temperature is {0:.1f}/{1:.1f} 'C.",
                 cpuTemperature,
@@ -40,7 +40,7 @@ void Controller::controllerLoop(const std::shared_ptr<Config>& config)
             std::time_t totalElapsedSeconds = std::time(nullptr) - m_turnOnTime;
             std::time_t elapsedMinutes = totalElapsedSeconds / 60;
             std::time_t elapsedSeconds = totalElapsedSeconds - elapsedMinutes * 60;
-            
+
             spdlog::info(
                 "Fan turned off: CPU temperature is {0:.1f}/{1:.1f} 'C. Worked for {2} minute{3}, {4} second{5}.",
                 cpuTemperature,

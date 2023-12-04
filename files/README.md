@@ -1,7 +1,7 @@
 # Example files
 
 ## fancontroller.service
-A `systemctl` example service that can be used to manage the executable. Should be installed in /etc/systemd/system and configured:
+A `systemctl` example service that can be used to manage the executable. Should be installed in `/etc/systemd/system` and configured:
 ```
 $ systemctl daemon-reload
 $ systemctl start fancontroller

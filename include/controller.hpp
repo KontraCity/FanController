@@ -28,11 +28,11 @@ private:
 public:
     // Singleton instance pointer
     static std::unique_ptr<Controller> Instance;
-    
+
 private:
     /// @brief Initialize fan controller
     Controller();
-    
+
 public:
     /// @brief Fan controller loop
     /// @param config Parsed fan controller config

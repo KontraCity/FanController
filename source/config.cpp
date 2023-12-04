@@ -5,7 +5,7 @@ namespace kc {
 void Config::GenerateDefaultFile()
 {
     using namespace ConfigConst;
-    
+
     std::ofstream configFile(ConfigFilePath, std::ios::trunc);
     if (!configFile)
     {
@@ -14,7 +14,7 @@ void Config::GenerateDefaultFile()
             ConfigFilePath
         ));
     }
-    
+
     configFile << fmt::format(
         "###################################################\n"
         "###                                             ###\n"
@@ -23,33 +23,33 @@ void Config::GenerateDefaultFile()
         "###                                             ###\n"
         "###################################################\n"
         "\n"
-        
+
         "## GPIO pin that fan control transistor is connected to\n"
         "## Fan controller will pull this pin HIGH when it wants to turn the fan on.\n"
         "## Fan controller will pull this pin LOW when fan should rest.\n"
         "# Should be an integer in [2, 27] range.\n"
         "{0} {1}\n"
         "\n"
-        
+
         "## Maximum CPU temperature\n"
         "## Fan controller will turn fan on when CPU reaches this temperature.\n"
         "# Should be an integer in [30, 80] range.\n"
         "# Note that Raspberry Pi CPU critical temperature is 85'C. Recommended value is 70'C.\n"
         "{2} {3}\n"
         "\n"
-        
+
         "## Minimum CPU temperature\n"
         "## Fan controller will turn fan off when CPU reaches this temperature.\n"
         "# Should be an integer in [30, 80] range.\n"
         "# Note that Raspberry Pi CPU idle temperature is ~40'C. Recommended value is 50'C.\n"
         "{4} {5}\n"
         "\n"
-        
+
         "## CPU temperature check interval in seconds\n"
         "## Fan controller will peek CPU temperature every N seconds set here.\n"
         "# Should be an integer in [1, 120] range.\n"
         "{6} {7}\n",
-        
+
         Values::ControlPin::Tag, Values::ControlPin::DefaultValue,
         Values::MaxTemperature::Tag, Values::MaxTemperature::DefaultValue,
         Values::MinTemperature::Tag, Values::MinTemperature::DefaultValue,
@@ -60,20 +60,20 @@ void Config::GenerateDefaultFile()
 Config::Config()
 {
     using namespace ConfigConst;
-    
+
     std::ifstream configFile(ConfigFilePath);
     if (!configFile)
         throw Error("Couldn't open configuration file");
-    
+
     while (!configFile.eof())
     {
         std::string line;
         std::getline(configFile, line);
-        
+
         size_t commentStart = line.find("#");
         if (commentStart != std::string::npos)
             line.erase(line.begin() + commentStart, line.end());
-        
+
         std::stringstream lineStream(line);
         std::string tag, stringValue;
         lineStream >> tag;
@@ -82,7 +82,7 @@ Config::Config()
         lineStream >> stringValue;
         if (stringValue.empty())
             throw Error(fmt::format("\"{0}\": No value found", tag));
-        
+
         int value;
         try
         {
@@ -92,7 +92,7 @@ Config::Config()
         {
             throw Error(fmt::format("\"{0}\": Value \"{1}\" is incorrect", tag, stringValue));
         }
-        
+
         if (tag == Values::ControlPin::Tag)
         {
             m_controlPin = value;
@@ -122,7 +122,7 @@ Config::Config()
             throw Error(fmt::format("\"{0}\": Tag is unknown", tag));
         }
     }
-    
+
     if (m_controlPin == -1)
         throw Error(fmt::format("\"{0}\": Tag is absent in configuration file", Values::ControlPin::Tag));
     if (m_maxTemperature == -1)
@@ -131,7 +131,7 @@ Config::Config()
         throw Error(fmt::format("\"{0}\": Tag is absent in configuration file", Values::MinTemperature::Tag));
     if (m_checkInterval == -1)
         throw Error(fmt::format("\"{0}\": Tag is absent in configuration file", Values::CheckInterval::Tag));
-    
+
     if (m_maxTemperature <= m_minTemperature)
     {
         throw Error(fmt::format(

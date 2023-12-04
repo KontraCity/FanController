@@ -10,7 +10,7 @@ double Utility::GetCpuTemperature()
 
     double temperature;
     temperatureFile >> temperature;
-    
+
     /*
     *   Temperature in the file is stored as an integer 1000 times higher than actual temperature.
     *   Example: Stored 56230, actual 56.23'C.

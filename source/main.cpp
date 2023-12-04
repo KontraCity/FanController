@@ -4,7 +4,6 @@
 
 // Library spdlog
 #include <spdlog/spdlog.h>
-#include <spdlog/sinks/stdout_color_sinks.h>
 
 // Custom modules
 #include "config.hpp"
@@ -39,7 +38,7 @@ int main(int parameterCount, char** parameterValue)
                 std::cerr << fmt::format("Couldn't open configuration file \"{0}\"! Are you root?\n", ConfigConst::ConfigFilePath);
                 return 1;
             }
-            
+
             std::cout << fmt::format(
                 "Generated default configuration file \"{0}\".\n"
                 "Currently configured values:\n"
@@ -60,7 +59,7 @@ int main(int parameterCount, char** parameterValue)
             std::cout << "Unknown option: " << parameter << '\n';
         }
     }
-    
+
     std::shared_ptr<Config> config;
     try
     {
@@ -73,7 +72,7 @@ int main(int parameterCount, char** parameterValue)
         spdlog::info("You can generate default configuration file by running \"{0} --generate-config\"", parameterValue[0]);
         return 1;
     }
-    
+
     spdlog::info(
         "Ready. GPIO control pin: {0}, min temperature: {1:.1f} 'C, max: {2:.1f} 'C, checking every {3} second{4}.",
         config->controlPin(),
@@ -81,7 +80,7 @@ int main(int parameterCount, char** parameterValue)
         static_cast<double>(config->maxTemperature()),
         config->checkInterval(), (config->checkInterval() == 1 ? "" : "s")
     );
-    
+
     try
     {
         kc::Controller::Instance->controllerLoop(config);
