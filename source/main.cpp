@@ -6,6 +6,7 @@
 #include <spdlog/spdlog.h>
 
 // Custom modules
+#include "utility.hpp"
 #include "config.hpp"
 #include "controller.hpp"
 using namespace kc;

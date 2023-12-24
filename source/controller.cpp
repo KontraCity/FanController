@@ -22,7 +22,18 @@ void Controller::controllerLoop(const std::shared_ptr<Config>& config)
         double cpuTemperature = Utility::GetCpuTemperature();
         if (cpuTemperature > m_config->maxTemperature() && !m_fanOn)
         {
-            digitalWrite(m_config->controlPin(), HIGH);
+            /*
+            *   Fan needs maximum amount of power when it starts spinning.
+            *   Not a problem for powerful 12v fans, but cheap 5v fans may not start.
+            *   Power surges or "pumping" will ensure that fan starts successfully.
+            */
+            for (int iteration = 0; iteration < 100; ++iteration)
+            {
+                digitalWrite(m_config->controlPin(), LOW);
+                Utility::Sleep(0.001);
+                digitalWrite(m_config->controlPin(), HIGH);
+                Utility::Sleep(0.001);
+            }
             m_fanOn = true;
             m_turnOnTime = std::time(nullptr);
 

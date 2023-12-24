@@ -17,7 +17,7 @@ namespace Utility
 
     /// @brief Stop execution for some time
     /// @param seconds Seconds to stop execution for
-    void Sleep(size_t seconds);
+    void Sleep(double seconds);
 }
 
 } // namespace kc

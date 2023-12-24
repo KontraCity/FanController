@@ -19,9 +19,9 @@ double Utility::GetCpuTemperature()
     return temperature / 1000;
 }
 
-void Utility::Sleep(size_t seconds)
+void Utility::Sleep(double seconds)
 {
-    std::this_thread::sleep_for(std::chrono::seconds(seconds));
+    std::this_thread::sleep_for(std::chrono::microseconds(static_cast<size_t>(seconds * 1'000'000)));
 }
 
 } // namespace kc
