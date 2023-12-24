@@ -25,7 +25,7 @@ void Controller::controllerLoop(const std::shared_ptr<Config>& config)
             /*
             *   Fan needs maximum amount of power when it starts spinning.
             *   Not a problem for powerful 12v fans, but cheap 5v fans may not start.
-            *   Power surges or "pumping" will ensure that fan starts successfully.
+            *   Power surges or "pumping" will ensure the fan starts successfully.
             */
             for (int iteration = 0; iteration < 100; ++iteration)
             {
