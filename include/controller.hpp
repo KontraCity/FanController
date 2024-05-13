@@ -9,9 +9,6 @@
 // Library WiringPi
 #include <wiringPi.h>
 
-// Library spdlog
-#include <spdlog/spdlog.h>
-
 // Custom modules
 #include "config.hpp"
 #include "utility.hpp"
@@ -21,6 +18,7 @@ namespace kc {
 class Controller
 {
 private:
+    spdlog::logger m_logger;
     bool m_fanOn;
     std::time_t m_turnOnTime;
     std::shared_ptr<Config> m_config;

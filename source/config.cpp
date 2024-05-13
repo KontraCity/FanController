@@ -1,19 +1,13 @@
 #include "config.hpp"
+using namespace kc::ConfigConst;
 
 namespace kc {
 
-void Config::GenerateDefaultFile()
+void Config::GenerateSampleFile()
 {
-    using namespace ConfigConst;
-
-    std::ofstream configFile(ConfigFilePath, std::ios::trunc);
+    std::ofstream configFile(ConfigFile, std::ios::trunc);
     if (!configFile)
-    {
-        throw std::runtime_error(fmt::format(
-            "kc::Config::GenerateDefaultFile(): Couldn't open configuration file \"{0}\"",
-            ConfigFilePath
-        ));
-    }
+        throw std::runtime_error("kc::Config::GenerateSampleFile(): Couldn't create sample configuration file");
 
     configFile << fmt::format(
         "###################################################\n"
@@ -28,27 +22,27 @@ void Config::GenerateDefaultFile()
         "## Fan controller will pull this pin HIGH when it wants to turn the fan on.\n"
         "## Fan controller will pull this pin LOW when fan should rest.\n"
         "# Should be an integer in [2, 27] range.\n"
-        "{0} {1}\n"
+        "{} {}\n"
         "\n"
 
         "## Maximum CPU temperature\n"
         "## Fan controller will turn fan on when CPU reaches this temperature.\n"
         "# Should be an integer in [30, 80] range.\n"
         "# Note that Raspberry Pi CPU critical temperature is 85'C. Recommended value is 70'C.\n"
-        "{2} {3}\n"
+        "{} {}\n"
         "\n"
 
         "## Minimum CPU temperature\n"
         "## Fan controller will turn fan off when CPU reaches this temperature.\n"
         "# Should be an integer in [30, 80] range.\n"
         "# Note that Raspberry Pi CPU idle temperature is ~40'C. Recommended value is 50'C.\n"
-        "{4} {5}\n"
+        "{} {}\n"
         "\n"
 
         "## CPU temperature check interval in seconds\n"
         "## Fan controller will peek CPU temperature every N seconds set here.\n"
         "# Should be an integer in [1, 120] range.\n"
-        "{6} {7}\n",
+        "{} {}\n",
 
         Values::ControlPin::Tag, Values::ControlPin::DefaultValue,
         Values::MaxTemperature::Tag, Values::MaxTemperature::DefaultValue,
@@ -58,10 +52,12 @@ void Config::GenerateDefaultFile()
 }
 
 Config::Config()
+    : m_controlPin(-1)
+    , m_maxTemperature(-1)
+    , m_minTemperature(-1)
+    , m_checkInterval(-1)
 {
-    using namespace ConfigConst;
-
-    std::ifstream configFile(ConfigFilePath);
+    std::ifstream configFile(ConfigFile);
     if (!configFile)
         throw Error("Couldn't open configuration file");
 
@@ -81,7 +77,7 @@ Config::Config()
             continue;
         lineStream >> stringValue;
         if (stringValue.empty())
-            throw Error(fmt::format("\"{0}\": No value found", tag));
+            throw Error(fmt::format("\"{}\": No value found", tag));
 
         int value;
         try
@@ -90,32 +86,32 @@ Config::Config()
         }
         catch (...)
         {
-            throw Error(fmt::format("\"{0}\": Value \"{1}\" is incorrect", tag, stringValue));
+            throw Error(fmt::format("\"{}\": Value \"{}\" is incorrect", tag, stringValue));
         }
 
         if (tag == Values::ControlPin::Tag)
         {
             m_controlPin = value;
             if (m_controlPin < 2 || m_controlPin > 27)
-                throw Error(fmt::format("\"{0}\": Pin \"{1}\" is not allowed (use 2-27 GPIO pins)", tag, m_controlPin));
+                throw Error(fmt::format("\"{}\": Pin \"{}\" is not allowed (use 2-27 GPIO pins)", tag, m_controlPin));
         }
         else if (tag == Values::MaxTemperature::Tag)
         {
             m_maxTemperature = value;
             if (m_maxTemperature < 30 || m_maxTemperature > 80)
-                throw Error(fmt::format("\"{0}\": Temperature \"{1}\" is out of range (use 30-80 'C)", tag, m_maxTemperature));
+                throw Error(fmt::format("\"{}\": Temperature \"{}\" is out of range (use 30-80 'C)", tag, m_maxTemperature));
         }
         else if (tag == Values::MinTemperature::Tag)
         {
             m_minTemperature = value;
             if (m_minTemperature < 30 || m_minTemperature > 80)
-                throw Error(fmt::format("\"{0}\": Temperature \"{1}\" is out of range (use 30-80 'C)", tag, m_minTemperature));
+                throw Error(fmt::format("\"{}\": Temperature \"{}\" is out of range (use 30-80 'C)", tag, m_minTemperature));
         }
         else if (tag == Values::CheckInterval::Tag)
         {
             m_checkInterval = value;
             if (m_checkInterval < 1 || m_checkInterval > 120)
-                throw Error(fmt::format("\"{0}\": Check interval \"{1}\" is out of range (use 1-120 seconds)", tag, m_checkInterval));
+                throw Error(fmt::format("\"{}\": Check interval \"{}\" is out of range (use 1-120 seconds)", tag, m_checkInterval));
         }
         else
         {
@@ -124,18 +120,18 @@ Config::Config()
     }
 
     if (m_controlPin == -1)
-        throw Error(fmt::format("\"{0}\": Tag is absent in configuration file", Values::ControlPin::Tag));
+        throw Error(fmt::format("\"{}\": Tag is absent in configuration file", Values::ControlPin::Tag));
     if (m_maxTemperature == -1)
-        throw Error(fmt::format("\"{0}\": Tag is absent in configuration file", Values::MaxTemperature::Tag));
+        throw Error(fmt::format("\"{}\": Tag is absent in configuration file", Values::MaxTemperature::Tag));
     if (m_minTemperature == -1)
-        throw Error(fmt::format("\"{0}\": Tag is absent in configuration file", Values::MinTemperature::Tag));
+        throw Error(fmt::format("\"{}\": Tag is absent in configuration file", Values::MinTemperature::Tag));
     if (m_checkInterval == -1)
-        throw Error(fmt::format("\"{0}\": Tag is absent in configuration file", Values::CheckInterval::Tag));
+        throw Error(fmt::format("\"{}\": Tag is absent in configuration file", Values::CheckInterval::Tag));
 
     if (m_maxTemperature <= m_minTemperature)
     {
         throw Error(fmt::format(
-            "\"{0}\" and \"{1}\": Max temperature should be higher than min temperature (currently is {2} and {3} 'C)",
+            "\"{}\" and \"{}\": Max temperature should be higher than min temperature (currently is {} and {} 'C)",
             Values::MinTemperature::Tag,
             Values::MaxTemperature::Tag,
             m_minTemperature,

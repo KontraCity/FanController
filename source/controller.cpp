@@ -5,7 +5,8 @@ namespace kc {
 std::unique_ptr<Controller> Controller::Instance(new Controller);
 
 Controller::Controller()
-    : m_fanOn(false)
+    : m_logger(Utility::CreateLogger("controller"))
+    , m_fanOn(false)
     , m_turnOnTime(0)
 {
     wiringPiSetupGpio();
@@ -37,8 +38,8 @@ void Controller::controllerLoop(const std::shared_ptr<Config>& config)
             m_fanOn = true;
             m_turnOnTime = std::time(nullptr);
 
-            spdlog::info(
-                "Fan turned on: CPU temperature is {0:.1f}/{1:.1f} 'C.",
+            m_logger.info(
+                "Fan turned on: CPU temperature is {:.1f}/{:.1f} 'C",
                 cpuTemperature,
                 static_cast<double>(m_config->maxTemperature())
             );
@@ -52,8 +53,8 @@ void Controller::controllerLoop(const std::shared_ptr<Config>& config)
             std::time_t elapsedMinutes = totalElapsedSeconds / 60;
             std::time_t elapsedSeconds = totalElapsedSeconds - elapsedMinutes * 60;
 
-            spdlog::info(
-                "Fan turned off: CPU temperature is {0:.1f}/{1:.1f} 'C. Worked for {2} minute{3}, {4} second{5}.",
+            m_logger.info(
+                "Fan turned off: CPU temperature is {:.1f}/{:.1f} 'C. Worked for {} minute{}, {} second{}",
                 cpuTemperature,
                 static_cast<double>(m_config->minTemperature()),
                 elapsedMinutes, (elapsedMinutes == 1 ? "" : "s"),

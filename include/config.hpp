@@ -13,8 +13,8 @@ namespace kc {
 
 namespace ConfigConst
 {
-    // Configuration file path
-    constexpr const char* ConfigFilePath = "/etc/fancontroller.conf";
+    // Controller configuration file path
+    constexpr const char* ConfigFile = "/etc/fancontroller.conf";
 
     namespace Values
     {
@@ -47,26 +47,30 @@ namespace ConfigConst
 class Config
 {
 public:
-    class Error : public std::invalid_argument
+    // Shared config instance pointer
+    using Pointer = std::shared_ptr<Config>;
+
+    // Configuration file read/parse error
+    class Error : public std::logic_error
     {
     public:
-        using invalid_argument::invalid_argument;
+        using logic_error::logic_error;
     };
 
 private:
-    int m_controlPin = -1;
-    int m_maxTemperature = -1;
-    int m_minTemperature = -1;
-    int m_checkInterval = -1;
+    int m_controlPin;
+    int m_maxTemperature;
+    int m_minTemperature;
+    int m_checkInterval;
 
 public:
-    /// @brief Generate default configuration file
-    /// @throw std::runtime_error if internal error occurs
-    static void GenerateDefaultFile();
+    /// @brief Generate sample configuration file
+    /// @throw std::runtime_error if file couldn't be created
+    static void GenerateSampleFile();
 
 public:
-    /// @brief Parse configuration file
-    /// @throw Config::Error if config parsing error occurs
+    /// @brief Read and parse configuration file
+    /// @throw Config::Error if reading/parsing error occurs
     Config();
 
     /// @brief Get fan control pin

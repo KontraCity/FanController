@@ -6,7 +6,7 @@ After=multi-user.target
 User=root
 Group=root
 WorkingDirectory=/usr/local/bin
-ExecStart=/usr/local/bin/FanController
+ExecStart=/usr/local/bin/FanController --force-color
 Restart=always
 RestartSec=15
 
