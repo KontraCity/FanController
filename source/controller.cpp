@@ -28,7 +28,7 @@ void Controller::controllerLoop(const std::shared_ptr<Config>& config)
             *   Not a problem for powerful 12v fans, but cheap 5v fans may not start.
             *   Power surges or "pumping" will ensure the fan starts successfully.
             */
-            for (int iteration = 0; iteration < 100; ++iteration)
+            for (int iteration = 0; iteration < 2500; ++iteration)
             {
                 digitalWrite(m_config->controlPin(), LOW);
                 Utility::Sleep(0.001);
