@@ -4,14 +4,10 @@ It continuously monitors CPU temperature and turns fan on only when the Pi is un
 
 ### Dependencies
 * [libfmt](https://github.com/fmtlib/fmt)
-* [libwiringpi](https://github.com/WiringPi/WiringPi) (works even on Bookworm despite being deprecated)
+* [libwiringpi](https://github.com/WiringPi/WiringPi)
 * [libspdlog](https://github.com/gabime/spdlog)
 
 ### Compilation
-```
-$ ./build.sh
-```
-OR
 ```
 $ mkdir build && cd build
 $ cmake .. -DCMAKE_BUILD_TYPE=Release
@@ -22,7 +18,7 @@ $ make -j
 It's up to you how you install the controller.
 It needs to run continuously and to have configuration file `/etc/fancontroller.conf`.
 For example, `FanController` executable can be put in `/usr/local/bin` and `systemctl` service `/etc/systemd/system/fancontroller.service` can be created.
-Don't forget to generate configuration file with `./FanController --generate-config`.
+Don't forget to generate configuration file with `./FanController --generate`.
 
 ## How it works?
 It peeks CPU temperature (`/sys/class/thermal/thermal_zone0/temp` file) every check interval that can be configured in configuration file.
@@ -34,7 +30,7 @@ Fan controller's configuration file is `/etc/fancontroller.conf`.
 Fan control pin, min/max temperatures and check interval can be configured there.
 Can be created using:
 ```
-$ ./FanController --generate-config
+$ ./FanController --generate
 ```
 
 ## Example files
