@@ -16,31 +16,22 @@ namespace ConfigConst
     // Controller configuration file path
     constexpr const char* ConfigFile = "/etc/fancontroller.conf";
 
-    namespace Values
+    namespace Tags
     {
-        namespace ControlPin
-        {
-            constexpr const char* Tag = "ControlPin";
-            constexpr unsigned int DefaultValue = 14;
-        }
+        constexpr const char* ControlPin = "ControlPin";
+        constexpr const char* MaxTemperature = "MaxTemperature";
+        constexpr const char* MinTemperature = "MinTemperature";
+        constexpr const char* CheckInterval = "CheckInterval";
+        constexpr const char* PumpingCycles = "PumpingCycles";
+    }
 
-        namespace MaxTemperature
-        {
-            constexpr const char* Tag = "MaxTemperature";
-            constexpr unsigned int DefaultValue = 70;
-        }
-
-        namespace MinTemperature
-        {
-            constexpr const char* Tag = "MinTemperature";
-            constexpr unsigned int DefaultValue = 50;
-        }
-
-        namespace CheckInterval
-        {
-            constexpr const char* Tag = "CheckInterval";
-            constexpr unsigned int DefaultValue = 10;
-        }
+    namespace Defaults
+    {
+        constexpr unsigned int ControlPin = 14;
+        constexpr unsigned int MaxTemperature = 70;
+        constexpr unsigned int MinTemperature = 50;
+        constexpr unsigned int CheckInterval = 10;
+        constexpr unsigned int PumpingCycles = 0;
     }
 }
 
@@ -62,6 +53,7 @@ private:
     int m_maxTemperature;
     int m_minTemperature;
     int m_checkInterval;
+    int m_pumpingCycles;
 
 public:
     /// @brief Generate sample configuration file
@@ -99,6 +91,13 @@ public:
     inline int checkInterval() const
     {
         return m_checkInterval;
+    }
+
+    /// @brief Get fan pumping cycles count
+    /// @return Fan pumping cycles count
+    inline int pumpingCycles() const
+    {
+        return m_pumpingCycles;
     }
 };
 

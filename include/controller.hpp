@@ -21,7 +21,6 @@ private:
     spdlog::logger m_logger;
     bool m_fanOn;
     std::time_t m_turnOnTime;
-    std::shared_ptr<Config> m_config;
 
 public:
     // Singleton instance pointer
@@ -34,7 +33,7 @@ private:
 public:
     /// @brief Fan controller loop
     /// @param config Parsed fan controller config
-    void controllerLoop(const std::shared_ptr<Config>& config);
+    void controllerLoop(const Config::Pointer& config);
 };
 
 } // namespace kc

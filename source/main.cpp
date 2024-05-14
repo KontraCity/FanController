@@ -89,7 +89,8 @@ static int ShowHelpMessage(const ParseResult& result)
         "    -fc, --force-color\tForce colored logs regardless of whether your tty supports them or not\n"
         "Unique options:\n"
         "    -h, --help\t\tShow this message and exit\n"
-        "    -g, --generate\tGenerate necessary files and exit\n",
+        "    -g, --generate\tGenerate necessary files and exit\n"
+        "Only one of the unique options may be passed at the same time. All others will be ignored.\n",
         result.executableName
     );
     return 0;
@@ -125,7 +126,7 @@ static int GenerateFiles()
 
     fmt::print(
         "Configuration file \"{}\" was created.\n"
-        "Please configure the client before starting it.\n",
+        "Please configure the file before starting FanController.\n",
         ConfigConst::ConfigFile
     );
     return 0;
@@ -177,11 +178,12 @@ int main(int argc, char** argv)
     try
     {
         logger.info(
-            "Ready: GPIO control pin: {}, min temperature: {:.1f} 'C, max: {:.1f} 'C, checking every {} second{}",
+            "Ready: GPIO control pin: {}, min temperature: {:.1f} 'C, max: {:.1f} 'C, checking every {} second{}, pumping cycles: {}",
             config->controlPin(),
             static_cast<double>(config->minTemperature()),
             static_cast<double>(config->maxTemperature()),
-            config->checkInterval(), (config->checkInterval() == 1 ? "" : "s")
+            config->checkInterval(), (config->checkInterval() == 1 ? "" : "s"),
+            config->pumpingCycles()
         );
         kc::Controller::Instance->controllerLoop(config);
     }

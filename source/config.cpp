@@ -42,12 +42,23 @@ void Config::GenerateSampleFile()
         "## CPU temperature check interval in seconds\n"
         "## Fan controller will peek CPU temperature every N seconds set here.\n"
         "# Should be an integer in [1, 120] range.\n"
+        "{} {}\n"
+        "\n"
+
+        "## Fan pumping cycles count\n"
+        "## The fan needs maximum amount of power when it starts spinning.\n"
+        "## Not a problem for powerful 12v fans, but cheap 5v fans may not start.\n"
+        "## The problem gets worse if the fan was still for months.\n"
+        "## Power surges or \"pumping\" will ensure the fan starts successfully.\n"
+        "# Should be an integer in [0, 2500] range, 0 disables fan pumping.\n"
+        "# You don't want to leave the Pi without cooling if the fan jams. Choose this value carefully and test.\n"
         "{} {}\n",
 
-        Values::ControlPin::Tag, Values::ControlPin::DefaultValue,
-        Values::MaxTemperature::Tag, Values::MaxTemperature::DefaultValue,
-        Values::MinTemperature::Tag, Values::MinTemperature::DefaultValue,
-        Values::CheckInterval::Tag, Values::CheckInterval::DefaultValue
+        Tags::ControlPin, Defaults::ControlPin,
+        Tags::MaxTemperature, Defaults::MaxTemperature,
+        Tags::MinTemperature, Defaults::MinTemperature,
+        Tags::CheckInterval, Defaults::CheckInterval,
+        Tags::PumpingCycles, Defaults::PumpingCycles
     );
 }
 
@@ -56,6 +67,7 @@ Config::Config()
     , m_maxTemperature(-1)
     , m_minTemperature(-1)
     , m_checkInterval(-1)
+    , m_pumpingCycles(-1)
 {
     std::ifstream configFile(ConfigFile);
     if (!configFile)
@@ -89,51 +101,59 @@ Config::Config()
             throw Error(fmt::format("\"{}\": Value \"{}\" is incorrect", tag, stringValue));
         }
 
-        if (tag == Values::ControlPin::Tag)
+        if (tag == Tags::ControlPin)
         {
             m_controlPin = value;
             if (m_controlPin < 2 || m_controlPin > 27)
                 throw Error(fmt::format("\"{}\": Pin \"{}\" is not allowed (use 2-27 GPIO pins)", tag, m_controlPin));
         }
-        else if (tag == Values::MaxTemperature::Tag)
+        else if (tag == Tags::MaxTemperature)
         {
             m_maxTemperature = value;
             if (m_maxTemperature < 30 || m_maxTemperature > 80)
                 throw Error(fmt::format("\"{}\": Temperature \"{}\" is out of range (use 30-80 'C)", tag, m_maxTemperature));
         }
-        else if (tag == Values::MinTemperature::Tag)
+        else if (tag == Tags::MinTemperature)
         {
             m_minTemperature = value;
             if (m_minTemperature < 30 || m_minTemperature > 80)
                 throw Error(fmt::format("\"{}\": Temperature \"{}\" is out of range (use 30-80 'C)", tag, m_minTemperature));
         }
-        else if (tag == Values::CheckInterval::Tag)
+        else if (tag == Tags::CheckInterval)
         {
             m_checkInterval = value;
             if (m_checkInterval < 1 || m_checkInterval > 120)
                 throw Error(fmt::format("\"{}\": Check interval \"{}\" is out of range (use 1-120 seconds)", tag, m_checkInterval));
         }
+        else if (tag == Tags::PumpingCycles)
+        {
+            m_pumpingCycles = value;
+            if (m_pumpingCycles < 0 || m_pumpingCycles > 2500)
+                throw Error(fmt::format("\"{}\": Pumping cycles count \"{}\" is out of range (use 0-2500 cycles)", tag, m_pumpingCycles));
+        }
         else
         {
-            throw Error(fmt::format("\"{0}\": Tag is unknown", tag));
+            throw Error(fmt::format("\"{}\": Tag is unknown", tag));
         }
     }
 
     if (m_controlPin == -1)
-        throw Error(fmt::format("\"{}\": Tag is absent in configuration file", Values::ControlPin::Tag));
+        throw Error(fmt::format("\"{}\": Tag is absent in configuration file", Tags::ControlPin));
     if (m_maxTemperature == -1)
-        throw Error(fmt::format("\"{}\": Tag is absent in configuration file", Values::MaxTemperature::Tag));
+        throw Error(fmt::format("\"{}\": Tag is absent in configuration file", Tags::MaxTemperature));
     if (m_minTemperature == -1)
-        throw Error(fmt::format("\"{}\": Tag is absent in configuration file", Values::MinTemperature::Tag));
+        throw Error(fmt::format("\"{}\": Tag is absent in configuration file", Tags::MinTemperature));
     if (m_checkInterval == -1)
-        throw Error(fmt::format("\"{}\": Tag is absent in configuration file", Values::CheckInterval::Tag));
+        throw Error(fmt::format("\"{}\": Tag is absent in configuration file", Tags::CheckInterval));
+    if (m_pumpingCycles == -1)
+        throw Error(fmt::format("\"{}\": Tag is absent in configuration file", Tags::PumpingCycles));
 
     if (m_maxTemperature <= m_minTemperature)
     {
         throw Error(fmt::format(
             "\"{}\" and \"{}\": Max temperature should be higher than min temperature (currently is {} and {} 'C)",
-            Values::MinTemperature::Tag,
-            Values::MaxTemperature::Tag,
+            Tags::MinTemperature,
+            Tags::MaxTemperature,
             m_minTemperature,
             m_maxTemperature
         ));

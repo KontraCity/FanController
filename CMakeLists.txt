@@ -7,6 +7,9 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 include_directories("include/")
 
+## --- Packages configuration --- ##
+find_package(fmt CONFIG REQUIRED)
+
 ## --- Executable configuration --- ##
 add_executable(FanController
     "source/config.cpp"
@@ -15,6 +18,6 @@ add_executable(FanController
     "source/utility.cpp"
 )
 target_link_libraries(FanController
-    "fmt"
+    fmt::fmt
     "wiringPi"
 )
